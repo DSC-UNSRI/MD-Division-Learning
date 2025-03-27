@@ -67,11 +67,13 @@ class AuthController {
     }
   }
 
-  Future<void> logout() async {
+  Future<bool> logout() async {
     try {
       await _auth.signOut();
+      return true;
     } catch (e) {
       if (kDebugMode) debugPrint('Error during logout: $e');
+      return false;
     }
   }
 }

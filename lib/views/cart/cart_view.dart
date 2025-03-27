@@ -1,18 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:testing/controllers/auth_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
+import '../auth/login_view.dart';
+import 'cart_item_view.dart';
 
 class CartView extends StatelessWidget {
   final CartController _cartController = CartController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
+  final AuthController _authController = AuthController();
 
   CartView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cart')),
+      appBar: AppBar(
+        title: Text('Cart'),
+        leading: IconButton(
+          icon: Icon(Icons.logout),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Confirm Logout'),
+                content: Text('Are you sure you want to log out?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final loggedOut = await _authController.logout();
+                      if (context.mounted) {
+                        if (loggedOut) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Logged out successfully'),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to log out'),
+                            ),
+                          );
+                        }
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginView(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    },
+                    child: Text(
+                      'Log out',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
       body: StreamBuilder<List<CartItem>>(
         stream: _cartController.getItems(),
         builder: (context, snapshot) {
@@ -25,9 +81,25 @@ class CartView extends StatelessWidget {
               return ListTile(
                 title: Text(item.name),
                 subtitle: Text('Quantity: ${item.quantity}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _cartController.deleteItem(item.id),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartItemView(item: item),
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _cartController.deleteItem(item.id),
+                    ),
+                  ],
                 ),
               );
             },
