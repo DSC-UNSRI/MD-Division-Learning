@@ -47,3 +47,4 @@ app.*.map.json
 .vscode/launch.json
 .env
 encryption_key.json
+firebase.json

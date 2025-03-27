@@ -22,8 +22,17 @@ abstract class Env {
 
   // Declare your environment variables as abstract getters
   @FieldKey(defaultValue: "")
-  String get envKeyOne;
+  String get firebaseAndroidApiKey;
 
   @FieldKey(defaultValue: "")
-  String get envKeyTwo;
+  String get firebaseAndroidAppId;
+
+  @FieldKey(defaultValue: "")
+  String get firebaseAndroidMessagingSenderId;
+
+  @FieldKey(defaultValue: "")
+  String get firebaseAndroidProjectId;
+
+  @FieldKey(defaultValue: "")
+  String get firebaseAndroidStorageBucket;
 }
