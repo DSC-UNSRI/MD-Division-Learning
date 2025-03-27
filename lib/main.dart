@@ -33,9 +33,11 @@
 //   }
 // }
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:testing/firebase_options.dart';
+import 'package:testing/views/cart/cart_view.dart';
 import 'views/auth/login_view.dart';
 
 void main() async {
@@ -47,14 +49,15 @@ void main() async {
 }
 
 class MvcApp extends StatelessWidget {
-  const MvcApp({super.key});
+  MvcApp({super.key});
+  final User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter MVC App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: LoginView(),
+      home: user != null ? CartView() : LoginView(),
     );
   }
 }
