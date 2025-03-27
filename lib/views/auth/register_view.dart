@@ -60,16 +60,18 @@ class _RegisterViewState extends State<RegisterView> {
                       _emailController.text,
                       _passwordController.text,
                     );
-                    if (result.user != null) {
-                      _authController.logout();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginView()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result.error ?? '')),
-                      );
+                    if (context.mounted) {
+                      if (result.user != null) {
+                        _authController.logout();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginView()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result.error ?? '')),
+                        );
+                      }
                     }
                   }
                 },

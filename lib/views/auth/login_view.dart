@@ -80,15 +80,17 @@ class _LoginViewState extends State<LoginView> {
               ElevatedButton(
                 onPressed: () async {
                   final result = await _authController.loginWithGoogle();
-                  if (result.user != null) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => CartView()),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(result.error ?? '')),
-                    );
+                  if (context.mounted) {
+                    if (result.user != null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => CartView()),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(result.error ?? '')),
+                      );
+                    }
                   }
                 },
                 child: Text('Login with Google'),
