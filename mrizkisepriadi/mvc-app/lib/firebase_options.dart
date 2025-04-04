@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:testing/encrypted/env.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -15,6 +16,8 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class DefaultFirebaseOptions {
+  static Env env = Env.create();
+
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       throw UnsupportedError(
@@ -52,11 +55,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDiCRe0MKD-81iyeug53qhD-YWVfNUcXjU',
-    appId: '1:21660558690:android:8aeea1b843e4f64b61783b',
-    messagingSenderId: '21660558690',
-    projectId: 'testing-b8303',
-    storageBucket: 'testing-b8303.firebasestorage.app',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: env.firebaseAndroidApiKey,
+    appId: env.firebaseAndroidAppId,
+    messagingSenderId: env.firebaseAndroidMessagingSenderId,
+    projectId: env.firebaseAndroidProjectId,
+    storageBucket: env.firebaseAndroidStorageBucket,
   );
 }
