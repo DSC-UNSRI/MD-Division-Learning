@@ -21,23 +21,33 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(title: Text('Welcome')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
+              Icon(Icons.lock_open_rounded,
+                  size: 80, color: Theme.of(context).primaryColor),
+              SizedBox(height: 24),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
                 validator: (value) => FormController.validateEmail(value ?? ''),
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 obscureText: _isPasswordObscured,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordObscured
@@ -54,13 +64,48 @@ class _LoginViewState extends State<LoginView> {
                 validator: (value) =>
                     FormController.validatePassword(value ?? ''),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final result = await _authController.loginWithEmail(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.login),
+                  label: Text('Login'),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      final result = await _authController.loginWithEmail(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+                      if (context.mounted) {
+                        if (result.user != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartView()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(result.error ?? 'Login failed')),
+                          );
+                        }
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    textStyle:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+              SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: Icon(Icons.g_mobiledata, size: 28),
+                  label: Text('Login with Google'),
+                  onPressed: () async {
+                    final result = await _authController.loginWithGoogle();
                     if (context.mounted) {
                       if (result.user != null) {
                         Navigator.pushReplacement(
@@ -69,40 +114,24 @@ class _LoginViewState extends State<LoginView> {
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(result.error ?? '')),
+                          SnackBar(
+                              content:
+                                  Text(result.error ?? 'Google login failed')),
                         );
                       }
                     }
-                  }
-                },
-                child: Text('Login'),
+                  },
+                ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final result = await _authController.loginWithGoogle();
-                  if (context.mounted) {
-                    if (result.user != null) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => CartView()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result.error ?? '')),
-                      );
-                    }
-                  }
-                },
-                child: Text('Login with Google'),
-              ),
-              ElevatedButton(
+              SizedBox(height: 12),
+              TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => RegisterView()),
                   );
                 },
-                child: Text('Register'),
+                child: Text("Don't have an account? Register"),
               ),
             ],
           ),

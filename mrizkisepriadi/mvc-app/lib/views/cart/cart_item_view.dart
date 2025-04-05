@@ -18,19 +18,27 @@ class CartItemView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Edit Item')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(
+                labelText: 'Item Name',
+                border: OutlineInputBorder(),
+              ),
             ),
+            SizedBox(height: 16),
             TextField(
               controller: _quantityController,
-              decoration: InputDecoration(labelText: 'Quantity'),
+              decoration: InputDecoration(
+                labelText: 'Quantity',
+                border: OutlineInputBorder(),
+              ),
               keyboardType: TextInputType.number,
             ),
-            ElevatedButton(
+            SizedBox(height: 24),
+            ElevatedButton.icon(
               onPressed: () {
                 _cartController.updateItem(
                   item.id,
@@ -39,7 +47,11 @@ class CartItemView extends StatelessWidget {
                 );
                 Navigator.pop(context);
               },
-              child: Text('Save'),
+              icon: Icon(Icons.save),
+              label: Text('Save Changes'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
             ),
           ],
         ),
