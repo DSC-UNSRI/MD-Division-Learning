@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testing/controllers/auth_controller.dart';
 import 'package:testing/controllers/profile_controller.dart';
+import 'package:testing/views/auth/login_view.dart';
 import 'package:testing/views/profile/profile_view.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
@@ -17,6 +18,8 @@ class CartView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = _authController.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('My Cart'),
@@ -33,8 +36,11 @@ class CartView extends StatelessWidget {
                   ),
                 );
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Failed to load profile")),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginView(),
+                  ),
                 );
               }
             },
@@ -83,26 +89,30 @@ class CartView extends StatelessWidget {
                   title: Text(item.name,
                       style: TextStyle(fontWeight: FontWeight.w600)),
                   subtitle: Text('Quantity: ${item.quantity}'),
-                  trailing: Wrap(
-                    spacing: 4,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, color: Colors.orange),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CartItemView(item: item),
+                  trailing: item.userId == currentUser?.uid
+                      ? Wrap(
+                          spacing: 4,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit, color: Colors.orange),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        CartItemView(item: item),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _cartController.deleteItem(item.id),
-                      ),
-                    ],
-                  ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () =>
+                                  _cartController.deleteItem(item.id),
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               );
             },

@@ -48,12 +48,7 @@ class CartController {
   }
 
   Stream<List<CartItem>> getItems() {
-    if (_currentUser == null) return const Stream.empty();
-
-    return _cartCollection
-    .where('userId', isEqualTo: _currentUser!.uid)
-    .snapshots()
-    .map((snapshot) {
+    return _cartCollection.snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => CartItem.fromMap(doc.data() as Map<String, dynamic>))
           .toList();

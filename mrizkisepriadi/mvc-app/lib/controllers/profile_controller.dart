@@ -4,7 +4,7 @@ import 'package:testing/models/profile.dart';
 
 class ProfileController {
   final CollectionReference _profileCollection =
-      FirebaseFirestore.instance.collection('profile');
+      FirebaseFirestore.instance.collection('users');
 
   Future<void> addUser(Profile user) async {
     final newUser =
@@ -31,7 +31,7 @@ class ProfileController {
     if (user == null) return null;
 
     final doc = await FirebaseFirestore.instance
-        .collection('profile')
+        .collection('users')
         .doc(user.uid)
         .get();
 
