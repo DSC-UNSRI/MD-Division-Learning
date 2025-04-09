@@ -68,7 +68,10 @@ class _LoginViewState extends State<LoginView> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  icon: Icon(Icons.login),
+                  icon: Icon(
+                    Icons.login,
+                    color: Colors.white,
+                  ),
                   label: Text('Login'),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -92,10 +95,11 @@ class _LoginViewState extends State<LoginView> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    textStyle:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      textStyle:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green),
                 ),
               ),
               SizedBox(height: 12),

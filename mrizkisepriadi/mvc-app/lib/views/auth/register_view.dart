@@ -80,48 +80,53 @@ class _RegisterViewState extends State<RegisterView> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  icon: Icon(Icons.app_registration),
-                  label: Text('Register'),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final result = await _authController.registerWithEmail(
-                        _emailController.text,
-                        _passwordController.text,
-                      );
+                    icon: Icon(
+                      Icons.app_registration,
+                      color: Colors.white,
+                    ),
+                    label: Text('Register'),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final result = await _authController.registerWithEmail(
+                          _emailController.text,
+                          _passwordController.text,
+                        );
 
-                      if (context.mounted) {
-                        if (result.user != null) {
-                          final newUser = Profile(
-                            id: result.user!.uid,
-                            name: _nameController.text,
-                            email: _emailController.text,
-                            bio: '',
-                          );
+                        if (context.mounted) {
+                          if (result.user != null) {
+                            final newUser = Profile(
+                              id: result.user!.uid,
+                              name: _nameController.text,
+                              email: _emailController.text,
+                              bio: '',
+                            );
 
-                          await _profileController.addUser(newUser);
-                          _authController.logout();
+                            await _profileController.addUser(newUser);
+                            _authController.logout();
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginView()),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(
-                                    result.error ?? 'Registration failed')),
-                          );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginView()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      result.error ?? 'Registration failed')),
+                            );
+                          }
                         }
                       }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    textStyle:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
+                    },
+                    style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green)),
               ),
             ],
           ),

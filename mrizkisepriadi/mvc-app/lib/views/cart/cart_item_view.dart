@@ -39,20 +39,27 @@ class CartItemView extends StatelessWidget {
             ),
             SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {
-                _cartController.updateItem(
-                  item.id,
-                  _nameController.text,
-                  int.parse(_quantityController.text),
-                );
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.save),
-              label: Text('Save Changes'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-              ),
-            ),
+                onPressed: () {
+                  _cartController.updateItem(
+                    item.id,
+                    _nameController.text,
+                    int.parse(_quantityController.text),
+                  );
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.save,
+                  color: Colors.white,
+                ),
+                label: Text('Save Changes'),
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green)),
           ],
         ),
       ),
