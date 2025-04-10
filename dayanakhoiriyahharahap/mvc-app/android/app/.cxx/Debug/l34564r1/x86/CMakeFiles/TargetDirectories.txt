@@ -1,0 +1,2 @@
+G:/MD-Division-Learning/dayanakhoiriyahharahap/mvc-app/android/app/.cxx/Debug/l34564r1/x86/CMakeFiles/edit_cache.dir
+G:/MD-Division-Learning/dayanakhoiriyahharahap/mvc-app/android/app/.cxx/Debug/l34564r1/x86/CMakeFiles/rebuild_cache.dir
