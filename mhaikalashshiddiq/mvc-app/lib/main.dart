@@ -55,8 +55,38 @@ class MvcApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter MVC App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Secure MVC Cart',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.blue.shade700,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue.shade700,
+          primary: Colors.blue.shade700,
+          secondary: Colors.blue.shade200,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+          elevation: 2,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue.shade700,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        cardTheme: CardTheme(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        fontFamily: 'Roboto',
+      ),
       home: user != null ? CartView() : LoginView(),
     );
   }
