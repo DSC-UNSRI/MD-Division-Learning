@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/form_controller.dart';
-import 'login_view.dart'; // Untuk navigasi kembali setelah registrasi
+import 'login_view.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -46,9 +46,7 @@ class _RegisterViewState extends State<RegisterView> {
       if (mounted) {
         setState(() => _isLoading = false);
         if (result.user != null) {
-          // Setelah registrasi berhasil dan data user disimpan di Firestore,
-          // user di-logout agar login kembali (biasanya untuk verifikasi email)
-          await _authController.logout(); // Pastikan logout selesai
+          await _authController.logout();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -87,8 +85,7 @@ class _RegisterViewState extends State<RegisterView> {
         title: Text('Create Account',
             style:
                 textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary)),
-        backgroundColor:
-            colorScheme.primaryContainer, // Menggunakan warna dari tema
+        backgroundColor: colorScheme.primaryContainer,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.onPrimary),

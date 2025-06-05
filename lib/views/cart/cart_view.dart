@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:testing/controllers/auth_controller.dart';
-import 'package:testing/views/profile/profile_view.dart'; // Pastikan path ini benar
+import 'package:testing/views/profile/profile_view.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
 import '../auth/login_view.dart';
@@ -157,7 +157,6 @@ class _CartViewState extends State<CartView> {
               ),
               onPressed: () {
                 if (dialogFormKey.currentState!.validate()) {
-                  // Validasi form dialog
                   final newItemId = FirebaseFirestore.instance
                       .collection('temp')
                       .doc()
@@ -166,10 +165,9 @@ class _CartViewState extends State<CartView> {
                     id: newItemId,
                     name: nameController.text.trim(),
                     quantity: int.parse(quantityController.text.trim()),
-                    // userId dan timestamps akan di-set oleh controller
                   );
                   _cartController.addItem(item);
-                  Navigator.of(context).pop(); // Tutup dialog setelah menambah
+                  Navigator.of(context).pop();
                 }
               },
               child: const Text('Add Item'),
@@ -296,8 +294,7 @@ class _CartViewState extends State<CartView> {
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add_shopping_cart_rounded),
                       label: const Text('Start Shopping'),
-                      onPressed:
-                          _showAddItemDialog, // Langsung panggil dialog tambah item
+                      onPressed: _showAddItemDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.secondary,
                         foregroundColor: colorScheme.onSecondary,
@@ -324,8 +321,7 @@ class _CartViewState extends State<CartView> {
                     borderRadius: BorderRadius.circular(12.0)),
                 color: colorScheme.surfaceVariant.withOpacity(0.8),
                 child: Padding(
-                  padding: const EdgeInsets.all(
-                      8.0), // Kurangi padding internal Card
+                  padding: const EdgeInsets.all(8.0),
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12.0, vertical: 8.0),
@@ -373,9 +369,7 @@ class _CartViewState extends State<CartView> {
                 ),
               );
             },
-            separatorBuilder: (context, index) => const SizedBox(
-                height:
-                    0), // Tidak perlu separator jika sudah pakai Card margin
+            separatorBuilder: (context, index) => const SizedBox(height: 0),
           );
         },
       ),

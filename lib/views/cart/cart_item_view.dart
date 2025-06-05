@@ -6,7 +6,6 @@ import 'package:testing/models/cart_item.dart';
 import 'package:testing/controllers/cart_controller.dart';
 
 class CartItemView extends StatefulWidget {
-  // Diubah menjadi StatefulWidget untuk _isLoading
   final CartItem item;
 
   const CartItemView({super.key, required this.item});
@@ -34,13 +33,11 @@ class _CartItemViewState extends State<CartItemView> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       final updatedItem = CartItem(
-        id: widget.item.id, // ID tidak berubah
+        id: widget.item.id,
         name: _nameController.text.trim(),
         quantity: int.parse(_quantityController.text.trim()),
-        userId: widget.item
-            .userId, // Pastikan userId tetap ada jika diperlukan controller
-        createdAt: widget.item.createdAt, // createdAt tidak berubah
-        // updatedAt akan di-handle oleh controller
+        userId: widget.item.userId,
+        createdAt: widget.item.createdAt,
       );
       await _cartController.updateItem(updatedItem);
 
@@ -52,8 +49,7 @@ class _CartItemViewState extends State<CartItemView> {
             backgroundColor: Colors.green[700],
           ),
         );
-        Navigator.pop(
-            context); // Kembali ke halaman sebelumnya setelah menyimpan
+        Navigator.pop(context);
       }
     }
   }

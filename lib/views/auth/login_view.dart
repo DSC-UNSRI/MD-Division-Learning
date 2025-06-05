@@ -2,11 +2,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Untuk ikon Google
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:testing/views/auth/register_view.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/form_controller.dart';
-import '../cart/cart_view.dart'; // Pastikan CartView siap untuk navigasi
+import '../cart/cart_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -36,9 +36,7 @@ class _LoginViewState extends State<LoginView> {
         if (result.user != null) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    CartView()), // Ganti ke halaman utama setelah login
+            MaterialPageRoute(builder: (context) => CartView()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -60,8 +58,7 @@ class _LoginViewState extends State<LoginView> {
       if (result.user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => CartView()), // Ganti ke halaman utama
+          MaterialPageRoute(builder: (context) => CartView()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +79,6 @@ class _LoginViewState extends State<LoginView> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      // Tidak menggunakan AppBar untuk tampilan login yang lebih imersif
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -93,10 +89,8 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Placeholder untuk Logo Aplikasi (Opsional)
                   Icon(
-                    Icons
-                        .shopping_cart_checkout_rounded, // Ganti dengan logo Anda
+                    Icons.shopping_cart_checkout_rounded,
                     size: 80,
                     color: colorScheme.primary,
                   ),
@@ -281,8 +275,7 @@ class _LoginViewState extends State<LoginView> {
                         child: Text(
                           'Register Now',
                           style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme
-                                .secondary, // Menggunakan warna aksen
+                            color: colorScheme.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

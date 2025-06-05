@@ -80,7 +80,6 @@ class _EditProfileViewState extends State<EditProfileView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Avatar (opsional, bisa ditampilkan di sini atau tidak)
                 Center(
                   child: CircleAvatar(
                     radius: 50,
@@ -166,13 +165,12 @@ class _EditProfileViewState extends State<EditProfileView> {
                     ),
                     filled: true,
                     fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
-                    alignLabelWithHint:
-                        true, // Agar label sejajar dengan hint saat maxLines > 1
+                    alignLabelWithHint: true,
                   ),
                   style: textTheme.bodyLarge
                       ?.copyWith(color: colorScheme.onSurface),
                   maxLines: 4,
-                  maxLength: 150, // Batasi panjang bio
+                  maxLength: 150,
                 ),
                 const SizedBox(height: 32),
 

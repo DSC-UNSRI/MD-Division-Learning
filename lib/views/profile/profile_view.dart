@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:testing/controllers/auth_controller.dart';
 import 'package:testing/models/user_model.dart';
 import 'package:testing/views/auth/login_view.dart';
-import 'edit_profile_view.dart'; // Pastikan file ini ada
+import 'edit_profile_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -52,14 +52,14 @@ class _ProfileViewState extends State<ProfileView> {
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary)),
               onPressed: () {
-                Navigator.of(context).pop(false); // User membatalkan
+                Navigator.of(context).pop(false);
               },
             ),
             TextButton(
               child: Text('Logout',
                   style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onPressed: () {
-                Navigator.of(context).pop(true); // User konfirmasi logout
+                Navigator.of(context).pop(true);
               },
             ),
           ],
@@ -95,8 +95,7 @@ class _ProfileViewState extends State<ProfileView> {
       Color? iconColor}) {
     final theme = Theme.of(context);
     return Card(
-      elevation:
-          0, // Menggunakan bayangan dari tema Card atau hilangkan jika tidak perlu
+      elevation: 0,
       color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.7),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -124,8 +123,8 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
-        // backgroundColor: Colors.transparent, // AppBar transparan jika diinginkan
-        // elevation: 0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_outlined),
@@ -174,8 +173,11 @@ class _ProfileViewState extends State<ProfileView> {
                           radius: 65,
                           backgroundColor: colorScheme.surfaceVariant,
                           backgroundImage: const AssetImage(
-                              'assets/images/dummy_avatar.png'), // Pastikan aset ini ada
-                          // child: _userModel!.name.isEmpty ? Icon(Icons.person, size: 60, color: colorScheme.primary) : null,
+                              'assets/images/dummy_avatar.png'),
+                          child: _userModel!.name.isEmpty
+                              ? Icon(Icons.person,
+                                  size: 60, color: colorScheme.primary)
+                              : null,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -196,7 +198,6 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                       const SizedBox(height: 32),
-
                       _buildInfoCard(
                         icon: Icons.person_pin_outlined,
                         title: 'Full Name',
@@ -209,8 +210,6 @@ class _ProfileViewState extends State<ProfileView> {
                         subtitle: _userModel!.bio!,
                         iconColor: colorScheme.tertiary,
                       ),
-                      // Email tidak ditampilkan di sini karena sudah ada di atas avatar
-
                       const SizedBox(height: 30),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.edit_note_outlined, size: 20),
