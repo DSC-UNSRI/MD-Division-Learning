@@ -1,4 +1,4 @@
-package com.example.testing
+package com.mapproject.cartapp
 
 import io.flutter.embedding.android.FlutterActivity
 
