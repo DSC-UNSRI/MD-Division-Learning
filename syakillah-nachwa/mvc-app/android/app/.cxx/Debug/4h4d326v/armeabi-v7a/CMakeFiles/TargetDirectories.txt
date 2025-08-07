@@ -1,0 +1,2 @@
+D:/GDGOC-UNSRI/work-together/MD-Division-Learning/syakillah-nachwa/mvc-app/android/app/.cxx/Debug/4h4d326v/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/GDGOC-UNSRI/work-together/MD-Division-Learning/syakillah-nachwa/mvc-app/android/app/.cxx/Debug/4h4d326v/armeabi-v7a/CMakeFiles/rebuild_cache.dir
