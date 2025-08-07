@@ -39,12 +39,17 @@ import 'package:flutter/material.dart';
 import 'package:testing/firebase_options.dart';
 import 'package:testing/views/cart/cart_view.dart';
 import 'views/auth/login_view.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Initialize notification service
+  await NotificationService().initialize();
+  
   runApp(MvcApp());
 }
 

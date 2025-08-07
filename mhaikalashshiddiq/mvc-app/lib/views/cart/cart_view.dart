@@ -4,18 +4,40 @@ import 'package:intl/intl.dart';
 import 'package:testing/controllers/auth_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
+import '../../services/notification_service.dart';
 import '../auth/login_view.dart';
 import '../profile/profile_view.dart';
 import 'cart_item_view.dart';
 
-class CartView extends StatelessWidget {
+class CartView extends StatefulWidget {
+  CartView({super.key});
+
+  @override
+  State<CartView> createState() => _CartViewState();
+}
+
+class _CartViewState extends State<CartView> {
   final CartController _cartController = CartController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final AuthController _authController = AuthController();
+  final NotificationService _notificationService = NotificationService();
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
-  CartView({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _initializeNotifications();
+  }
+
+  Future<void> _initializeNotifications() async {
+    try {
+      await _cartController.subscribeToNotifications();
+      print('Cart notifications initialized');
+    } catch (e) {
+      print('Error initializing cart notifications: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +89,14 @@ class CartView extends StatelessWidget {
               title: Text('My Cart'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications, color: Colors.orange),
+              title: Text('Test Notification'),
+              onTap: () {
+                Navigator.pop(context);
+                _sendTestNotification();
               },
             ),
             Divider(),
@@ -369,9 +399,17 @@ class CartView extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel'),
           ),
-          ElevatedButton(
+                      ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
+              
+              // Unsubscribe from notifications before logout
+              try {
+                await _cartController.unsubscribeFromNotifications();
+              } catch (e) {
+                print('Error unsubscribing from notifications: $e');
+              }
+              
               final loggedOut = await _authController.logout();
               if (context.mounted) {
                 if (loggedOut) {
@@ -407,5 +445,25 @@ class CartView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Send test notification
+  Future<void> _sendTestNotification() async {
+    try {
+      await _notificationService.sendTestNotification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Test notification sent!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send test notification: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
