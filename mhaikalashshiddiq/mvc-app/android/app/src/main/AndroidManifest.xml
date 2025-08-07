@@ -34,25 +34,6 @@
             </intent-filter>
         </activity>
         
-        <!-- Firebase Cloud Messaging Service -->
-        <service
-            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        
-        <!-- Firebase Cloud Messaging Receiver -->
-        <receiver
-            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingReceiver"
-            android:exported="false"
-            tools:replace="android:exported">
-            <intent-filter>
-                <action android:name="com.google.firebase.messaging.RECEIVE" />
-            </intent-filter>
-        </receiver>
-        
         <!-- Default notification icon and color -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
