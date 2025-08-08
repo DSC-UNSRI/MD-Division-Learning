@@ -23,33 +23,33 @@ class NotificationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  bool _isInitialized = false;
+  bool _coreInitialized = false;
+  bool _userInitialized = false;
 
-  /// Initialize the notification service
-  Future<void> initialize() async {
-    if (_isInitialized) return;
-
+  /// Initialize core messaging hooks (safe to call at app start)
+  Future<void> initCore() async {
+    if (_coreInitialized) return;
     try {
-      // Request permission for notifications
-      await _requestPermissions();
-      
-      // Initialize local notifications
       await _initializeLocalNotifications();
-      
-      // Initialize Firebase messaging
       await _initializeFirebaseMessaging();
-      
-      // Get and save FCM token
-      await _getAndSaveToken();
-      
-      // Subscribe to cart updates topic
-      await _subscribeToTopic();
-      
-      _isInitialized = true;
-      print('Notification service initialized successfully');
+      _coreInitialized = true;
+      print('Notification core initialized');
     } catch (e) {
-      print('Error initializing notification service: $e');
-      rethrow;
+      print('Error initializing notification core: $e');
+    }
+  }
+
+  /// Initialize user-specific messaging (call after login)
+  Future<void> initializeForUser() async {
+    if (_userInitialized) return;
+    try {
+      await _requestPermissions();
+      await _getAndSaveToken();
+      await _subscribeToTopic();
+      _userInitialized = true;
+      print('Notification user bindings initialized');
+    } catch (e) {
+      print('Error initializing notification for user: $e');
     }
   }
 
@@ -129,10 +129,8 @@ class NotificationService {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.data}');
 
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-      await _showLocalNotification(message);
-    }
+    // Show notification for both notification and data-only messages
+    await _showLocalNotification(message);
   }
 
   /// Handle when message is opened (app opened from notification)
@@ -173,12 +171,51 @@ class NotificationService {
       iOS: iOSPlatformChannelSpecifics,
     );
 
+    final String title =
+        message.notification?.title ?? message.data['title'] ?? 'Cart Update';
+    final String body =
+        message.notification?.body ?? message.data['body'] ?? 'Your cart has been updated';
+
     await _localNotifications.show(
       message.hashCode,
-      message.notification?.title ?? 'Cart Update',
-      message.notification?.body ?? 'Your cart has been updated',
+      title,
+      body,
       platformChannelSpecifics,
       payload: jsonEncode(message.data),
+    );
+  }
+
+  /// Public helper to show local notification from app logic
+  Future<void> showLocal(String title, String body, {Map<String, dynamic>? data}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'cart_updates_channel',
+      'Cart Updates',
+      channelDescription: 'Notifications for cart item changes',
+      importance: Importance.high,
+      priority: Priority.high,
+      showWhen: true,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await _localNotifications.show(
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: jsonEncode(data ?? {}),
     );
   }
 

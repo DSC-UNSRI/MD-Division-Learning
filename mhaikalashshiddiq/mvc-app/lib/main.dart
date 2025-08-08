@@ -46,16 +46,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
-  // Initialize notification service
-  await NotificationService().initialize();
-  
+
   runApp(MvcApp());
 }
 
 class MvcApp extends StatelessWidget {
   MvcApp({super.key});
-  final User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +88,35 @@ class MvcApp extends StatelessWidget {
         ),
         fontFamily: 'Roboto',
       ),
-      home: user != null ? CartView() : LoginView(),
+      home: AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Show loading while checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
+        // Show cart if user is logged in, otherwise show login
+        if (snapshot.hasData && snapshot.data != null) {
+          return CartView();
+        } else {
+          return LoginView();
+        }
+      },
     );
   }
 }

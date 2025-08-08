@@ -5,7 +5,6 @@ import 'package:testing/controllers/auth_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
 import '../../services/notification_service.dart';
-import '../auth/login_view.dart';
 import '../profile/profile_view.dart';
 import 'cart_item_view.dart';
 
@@ -32,6 +31,9 @@ class _CartViewState extends State<CartView> {
 
   Future<void> _initializeNotifications() async {
     try {
+      // Initialize core hooks (idempotent)
+      await NotificationService().initCore();
+      // Bind user-specific token & topics
       await _cartController.subscribeToNotifications();
       print('Cart notifications initialized');
     } catch (e) {
@@ -403,37 +405,47 @@ class _CartViewState extends State<CartView> {
             onPressed: () async {
               Navigator.pop(context);
               
-              // Unsubscribe from notifications before logout
-              try {
-                await _cartController.unsubscribeFromNotifications();
-              } catch (e) {
-                print('Error unsubscribing from notifications: $e');
-              }
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
               
-              final loggedOut = await _authController.logout();
-              if (context.mounted) {
-                if (loggedOut) {
+              try {
+                // Unsubscribe from notifications before logout
+                await _cartController.unsubscribeFromNotifications();
+                
+                // Perform logout
+                final loggedOut = await _authController.logout();
+                
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+                
+                if (!loggedOut && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Logged out successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Failed to log out'),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginView(),
-                  ),
-                  (route) => false,
-                );
+                // Note: No manual navigation needed - AuthWrapper will handle it automatically
+              } catch (e) {
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error during logout: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(

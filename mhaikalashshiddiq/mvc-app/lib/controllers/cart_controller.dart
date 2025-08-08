@@ -172,9 +172,16 @@ class CartController {
 
   // Show cart update notification
   void _showCartUpdateNotification(String title, String body, CartItem item) {
-    // This would typically trigger a local notification
-    // The actual notification display is handled by the NotificationService
-    print('Cart notification: $title - $body');
+    _notificationService.showLocal(
+      title,
+      body,
+      data: {
+        'type': 'cart_update',
+        'itemId': item.id,
+        'name': item.name,
+        'quantity': item.quantity,
+      },
+    );
   }
 
   // Get FCM token for current user
@@ -184,7 +191,8 @@ class CartController {
 
   // Subscribe to cart update notifications
   Future<void> subscribeToNotifications() async {
-    await _notificationService.initialize();
+    await _notificationService.initializeForUser();
+    // Also ensure token is saved and topics are subscribed after login
     initializeCartListener();
   }
 
