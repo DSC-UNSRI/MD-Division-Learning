@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/cart_item.dart';
 import '../services/notification_service.dart';
@@ -7,6 +9,7 @@ class CartController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final NotificationService _notificationService = NotificationService();
+  StreamSubscription<QuerySnapshot>? _cartListenerSub;
 
   // Get reference to cart collection
   CollectionReference get _cartCollection => _firestore.collection('cart');
@@ -120,16 +123,28 @@ class CartController {
       final userId = _currentUserId;
       
       // Listen to all cart changes for notifications
-      _cartCollection.snapshots().listen((snapshot) {
-        for (var change in snapshot.docChanges) {
-          _handleCartChange(change);
-        }
-      });
+      _cartListenerSub?.cancel();
+      _cartListenerSub = _cartCollection.snapshots().listen(
+        (snapshot) {
+          for (var change in snapshot.docChanges) {
+            _handleCartChange(change);
+          }
+        },
+        onError: (Object error) {
+          // Suppress permission errors that can occur during logout/navigation
+          debugPrint('Cart listener error (ignored): $error');
+        },
+      );
       
       print('Cart listener initialized for user: $userId');
     } catch (e) {
       print('Error initializing cart listener: $e');
     }
+  }
+
+  void stopCartListener() {
+    _cartListenerSub?.cancel();
+    _cartListenerSub = null;
   }
 
   // Handle cart changes for notifications

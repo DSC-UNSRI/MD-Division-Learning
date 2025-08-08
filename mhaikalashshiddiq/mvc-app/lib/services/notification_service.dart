@@ -44,6 +44,10 @@ class NotificationService {
     if (_userInitialized) return;
     try {
       await _requestPermissions();
+      // Force a fresh token to avoid stale association across accounts
+      try {
+        await _firebaseMessaging.deleteToken();
+      } catch (_) {}
       await _getAndSaveToken();
       await _subscribeToTopic();
       _userInitialized = true;
@@ -264,7 +268,7 @@ class NotificationService {
       }
 
       final String userId = user.uid;
-      final String tokenId = token.hashCode.toString();
+      final String tokenId = token; // use the raw token as document ID for backend compatibility
       
       await _firestore
           .collection('users')
@@ -273,7 +277,34 @@ class NotificationService {
           .doc(tokenId)
           .set({
         'token': token,
+        'userId': userId,
         'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'platform': Platform.operatingSystem,
+        'appVersion': '1.0.0',
+      }, SetOptions(merge: true));
+
+      // Mirror token in a global collection for backend compatibility
+      await _firestore.collection('device_tokens').doc(tokenId).set({
+        'token': token,
+        'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'platform': Platform.operatingSystem,
+        'appVersion': '1.0.0',
+      }, SetOptions(merge: true));
+
+      // Optional secondary path alias if backend expects another name
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('tokens')
+          .doc(tokenId)
+          .set({
+        'token': token,
+        'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
         'platform': Platform.operatingSystem,
         'appVersion': '1.0.0',
       }, SetOptions(merge: true));
@@ -296,6 +327,10 @@ class NotificationService {
         // Also subscribe to general cart updates
         await _firebaseMessaging.subscribeToTopic('cart_updates');
         print('Subscribed to general cart updates topic');
+
+        // Extra general topics for broader compatibility
+        try { await _firebaseMessaging.subscribeToTopic('cart'); } catch (_) {}
+        try { await _firebaseMessaging.subscribeToTopic('cart_all'); } catch (_) {}
       }
     } catch (e) {
       print('Error subscribing to topic: $e');
@@ -353,7 +388,7 @@ class NotificationService {
       
       if (user != null && token != null) {
         final String userId = user.uid;
-        final String tokenId = token.hashCode.toString();
+        final String tokenId = token; // match save path
         
         await _firestore
             .collection('users')
@@ -361,6 +396,10 @@ class NotificationService {
             .collection('device_tokens')
             .doc(tokenId)
             .delete();
+
+        // Remove mirrors
+        try { await _firestore.collection('device_tokens').doc(tokenId).delete(); } catch (_) {}
+        try { await _firestore.collection('users').doc(userId).collection('tokens').doc(tokenId).delete(); } catch (_) {}
         
         print('FCM token removed from Firestore');
       }

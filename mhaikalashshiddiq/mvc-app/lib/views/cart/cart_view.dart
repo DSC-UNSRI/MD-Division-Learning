@@ -29,6 +29,14 @@ class _CartViewState extends State<CartView> {
     _initializeNotifications();
   }
 
+  @override
+  void dispose() {
+    _cartController.stopCartListener();
+    _nameController.dispose();
+    _quantityController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initializeNotifications() async {
     try {
       // Initialize core hooks (idempotent)
@@ -403,28 +411,26 @@ class _CartViewState extends State<CartView> {
           ),
                       ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              if (mounted) Navigator.pop(context);
               
-              // Show loading indicator
+              // Show loading indicator using global navigator (safe across route changes)
+              final rootContext = Navigator.of(context, rootNavigator: true).context;
               showDialog(
-                context: context,
+                context: rootContext,
                 barrierDismissible: false,
-                builder: (context) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                useRootNavigator: true,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
               );
               
               try {
-                // Unsubscribe from notifications before logout
-                await _cartController.unsubscribeFromNotifications();
-                
-                // Perform logout
+                // Perform logout first to avoid permission issues on Firestore listeners
                 final loggedOut = await _authController.logout();
                 
-                // Close loading dialog
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
+                // Close loading dialog (ensure root navigator)
+                try {
+                  final nav = Navigator.of(rootContext, rootNavigator: true);
+                  if (nav.canPop()) nav.pop();
+                } catch (_) {}
                 
                 if (!loggedOut && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -433,12 +439,23 @@ class _CartViewState extends State<CartView> {
                       backgroundColor: Colors.red,
                     ),
                   );
+                } else {
+                  // After auth state changed and UI navigates away, clean up messaging topics/token safely
+                  // Do this in microtask to avoid race with route change
+                  Future.microtask(() async {
+                    try {
+                      await _cartController.unsubscribeFromNotifications();
+                    } catch (_) {}
+                  });
                 }
-                // Note: No manual navigation needed - AuthWrapper will handle it automatically
+                // AuthWrapper will redirect automatically
               } catch (e) {
-                // Close loading dialog
+                // Close loading dialog and show error
+                try {
+                  final nav = Navigator.of(rootContext, rootNavigator: true);
+                  if (nav.canPop()) nav.pop();
+                } catch (_) {}
                 if (context.mounted) {
-                  Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error during logout: $e'),

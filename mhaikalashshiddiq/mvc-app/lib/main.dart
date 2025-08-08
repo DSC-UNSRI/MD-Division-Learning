@@ -40,6 +40,7 @@ import 'package:testing/firebase_options.dart';
 import 'package:testing/views/cart/cart_view.dart';
 import 'views/auth/login_view.dart';
 import 'services/notification_service.dart';
+import 'services/navigation_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +58,7 @@ class MvcApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Secure MVC Cart',
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
