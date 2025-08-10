@@ -39,23 +39,26 @@ import 'package:flutter/material.dart';
 import 'package:testing/firebase_options.dart';
 import 'package:testing/views/cart/cart_view.dart';
 import 'views/auth/login_view.dart';
+import 'services/notification_service.dart';
+import 'services/navigation_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(MvcApp());
 }
 
 class MvcApp extends StatelessWidget {
   MvcApp({super.key});
-  final User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Secure MVC Cart',
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -87,7 +90,35 @@ class MvcApp extends StatelessWidget {
         ),
         fontFamily: 'Roboto',
       ),
-      home: user != null ? CartView() : LoginView(),
+      home: AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Show loading while checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
+        // Show cart if user is logged in, otherwise show login
+        if (snapshot.hasData && snapshot.data != null) {
+          return CartView();
+        } else {
+          return LoginView();
+        }
+      },
     );
   }
 }

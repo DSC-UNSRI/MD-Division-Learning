@@ -3,6 +3,7 @@ import 'package:testing/views/auth/register_view.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/form_controller.dart';
 import '../cart/cart_view.dart';
+import '../../services/notification_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -218,6 +219,9 @@ class _LoginViewState extends State<LoginView> {
       });
       if (context.mounted) {
         if (result.user != null) {
+          // Initialize user-specific FCM after login
+          await NotificationService().initCore();
+          await NotificationService().initializeForUser();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => CartView()),
@@ -244,6 +248,9 @@ class _LoginViewState extends State<LoginView> {
     });
     if (context.mounted) {
       if (result.user != null) {
+        // Initialize user-specific FCM after Google login
+        await NotificationService().initCore();
+        await NotificationService().initializeForUser();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CartView()),
