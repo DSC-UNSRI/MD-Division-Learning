@@ -46,11 +46,11 @@ class UserModel {
     int? updatedAt,
   }) {
     return UserModel(
-      id: this.id,
+      id: id,
       name: name ?? this.name,
-      email: this.email,
+      email: email,
       bio: bio ?? this.bio,
-      createdAt: this.createdAt,
+      createdAt: createdAt,
       updatedAt: updatedAt ?? DateTime.now().millisecondsSinceEpoch,
     );
   }

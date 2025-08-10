@@ -1,70 +1,75 @@
-// import 'package:flutter/material.dart';
-// import 'controllers/task.dart';
-// // import 'encrypted/env.dart';
-// import 'views/task_list.dart';
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-
-//   runApp(TaskListApp());
-// }
-
-// class TaskListApp extends StatelessWidget {
-//   final TaskListController controller = TaskListController();
-
-//   TaskListApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text(controller.tasks.isNotEmpty
-//               ? "${controller.tasks.length} tasks"
-//               : "No tasks"),
-//         ),
-//         body: TaskListView(controller: controller),
-//       ),
-//     );
-//   }
-// }
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+// lib/main.dart - UPDATED VERSION
 import 'package:flutter/material.dart';
-import 'package:testing/firebase_options.dart';
-import 'package:testing/views/cart/cart_view.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:testing/services/notification_service.dart';
 import 'views/auth/login_view.dart';
+import 'views/cart/cart_view.dart';
 
 void main() async {
+  // Pastikan Flutter binding sudah initialized
   WidgetsFlutterBinding.ensureInitialized();
   
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ).catchError((e) {
-    if (e.code == 'duplicate-app') {
-      return Firebase.app();
-    }
-    throw e;
-  });
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp();
+    print("✅ Firebase initialized successfully");
+    
+    // Initialize Notification Service
+    await NotificationService().initialize();
+    print("✅ Notification Service initialized");
+    
+  } catch (e) {
+    print("❌ Error during initialization: $e");
+  }
   
-  runApp(MvcApp());
+  runApp(MyApp());
 }
 
-class MvcApp extends StatelessWidget {
-  MvcApp({super.key});
-  final User? user = FirebaseAuth.instance.currentUser;
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter MVC App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: user != null ? CartView() : LoginView(),
+      title: 'MVC Cart App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: AuthWrapper(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading...'),
+                ],
+              ),
+            ),
+          );
+        }
+        
+        if (snapshot.hasData && snapshot.data != null) {
+          // User sudah login, tampilkan CartView
+          return CartView();
+        } else {
+          // User belum login, tampilkan LoginView
+          return LoginView();
+        }
+      },
     );
   }
 }
