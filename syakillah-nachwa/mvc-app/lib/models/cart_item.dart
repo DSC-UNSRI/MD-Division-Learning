@@ -1,3 +1,4 @@
+// lib/models/cart_item.dart - FIXED VERSION
 class CartItem {
   String id;
   String name;
@@ -14,8 +15,8 @@ class CartItem {
     int? createdAt,
     int? updatedAt,
   }) : 
-    this.createdAt = createdAt ?? DateTime.now().millisecondsSinceEpoch,
-    this.updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
+    createdAt = createdAt ?? DateTime.now().millisecondsSinceEpoch,
+    updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toMap() {
     return {
@@ -45,4 +46,4 @@ class CartItem {
   bool isOwnedBy(String? userId) {
     return userId != null && this.userId == userId;
   }
-}command:java.show.server.task.status
+}
