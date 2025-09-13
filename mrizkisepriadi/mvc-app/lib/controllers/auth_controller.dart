@@ -99,7 +99,8 @@ class AuthController {
       // Initialize notifications after successful Google login
       if (userCredential.user != null) {
         if (kDebugMode) {
-          debugPrint('✅ Google login successful for: ${userCredential.user!.email}');
+          debugPrint(
+              '✅ Google login successful for: ${userCredential.user!.email}');
           debugPrint('👤 User ID: ${userCredential.user!.uid}');
           debugPrint('🔔 Initializing notifications...');
         }
@@ -112,7 +113,8 @@ class AuthController {
           }
         } catch (e) {
           if (kDebugMode) {
-            debugPrint('❌ Failed to initialize notifications after Google login: $e');
+            debugPrint(
+                '❌ Failed to initialize notifications after Google login: $e');
           }
           // Don't fail login if notifications fail
         }

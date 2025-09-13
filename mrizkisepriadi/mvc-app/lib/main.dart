@@ -59,7 +59,7 @@ void main() async {
       } catch (e) {
         print('Error initializing notifications in main: $e');
       }
-    } 
+    }
   } catch (e) {
     print('Error in main initialization: $e');
   }

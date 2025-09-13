@@ -6,7 +6,6 @@ import 'package:testing/views/auth/login_view.dart';
 import 'package:testing/views/profile/profile_view.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
-import 'cart_item_view.dart';
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -180,15 +179,12 @@ class _CartViewState extends State<CartView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfileView(user: profile),
-                  ),
+                      builder: (context) => ProfileView(user: profile)),
                 );
               } else {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginView(),
-                  ),
+                  MaterialPageRoute(builder: (context) => LoginView()),
                 );
               }
             },
@@ -294,28 +290,22 @@ class _CartViewState extends State<CartView> {
                 margin: EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColorLight,
-                    child: Icon(Icons.shopping_bag,
-                        color: Theme.of(context).primaryColorDark),
+                    child: Text('${item.quantity}'),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                   ),
                   title: Text(item.name,
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text('Quantity: ${item.quantity}'),
-                  trailing: item.userId == currentUser?.uid
-                      ? Wrap(
-                          spacing: 4,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                      'Created: ${item.createdAt.toString().split(' ')[0]}'),
+                  trailing: item.userId == _authController.currentUser?.uid
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.edit, color: Colors.orange),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        CartItemView(item: item),
-                                  ),
-                                );
-                              },
+                              icon: Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () =>
+                                  _showEditItemDialog(context, item),
                             ),
                             IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
@@ -391,22 +381,14 @@ class _CartViewState extends State<CartView> {
             onPressed: () async {
               if (_nameController.text.isEmpty ||
                   _quantityController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please fill in all fields')),
-                );
                 return;
               }
 
               final user = _authController.currentUser;
-              if (user == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('You must be logged in')),
-                );
-                return;
-              }
+              if (user == null) return;
 
               final item = CartItem(
-                id: DateTime.now().toString(),
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
                 name: _nameController.text,
                 quantity: int.parse(_quantityController.text),
                 createdAt: DateTime.now(),
@@ -421,10 +403,65 @@ class _CartViewState extends State<CartView> {
               _quantityController.clear();
 
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Item added to cart')),
+                SnackBar(content: Text('Item added to cart!')),
               );
             },
             child: Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditItemDialog(BuildContext context, CartItem item) {
+    _nameController.text = item.name;
+    _quantityController.text = item.quantity.toString();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit Item'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Item Name'),
+            ),
+            TextField(
+              controller: _quantityController,
+              decoration: InputDecoration(labelText: 'Quantity'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_nameController.text.isEmpty ||
+                  _quantityController.text.isEmpty) {
+                return;
+              }
+
+              _cartController.updateItem(
+                item.id,
+                _nameController.text,
+                int.parse(_quantityController.text),
+              );
+
+              Navigator.pop(context);
+              _nameController.clear();
+              _quantityController.clear();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Item updated!')),
+              );
+            },
+            child: Text('Update'),
           ),
         ],
       ),
