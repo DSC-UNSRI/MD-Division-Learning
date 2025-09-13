@@ -1,0 +1,2 @@
+C:/MVC-App/Secure-MVC-Flutter-Firebase-Example/android/app/.cxx/Debug/y355i681/x86_64/CMakeFiles/edit_cache.dir
+C:/MVC-App/Secure-MVC-Flutter-Firebase-Example/android/app/.cxx/Debug/y355i681/x86_64/CMakeFiles/rebuild_cache.dir

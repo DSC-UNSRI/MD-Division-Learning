@@ -55,7 +55,7 @@ void main() {
           print(
               'Error: Cannot calculate negative base with non-integer exponent.');
         } else {
-          print('Result: ${num1}^${num2} = ${pow(num1, num2)}');
+          print('Result: $num1^$num2 = ${pow(num1, num2)}');
         }
         break;
       default:
