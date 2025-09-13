@@ -4,18 +4,50 @@ import 'package:intl/intl.dart';
 import 'package:testing/controllers/auth_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
-import '../auth/login_view.dart';
+import '../../services/notification_service.dart';
 import '../profile/profile_view.dart';
 import 'cart_item_view.dart';
 
-class CartView extends StatelessWidget {
+class CartView extends StatefulWidget {
+  CartView({super.key});
+
+  @override
+  State<CartView> createState() => _CartViewState();
+}
+
+class _CartViewState extends State<CartView> {
   final CartController _cartController = CartController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final AuthController _authController = AuthController();
+  final NotificationService _notificationService = NotificationService();
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
-  CartView({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _initializeNotifications();
+  }
+
+  @override
+  void dispose() {
+    _cartController.stopCartListener();
+    _nameController.dispose();
+    _quantityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeNotifications() async {
+    try {
+      // Initialize core hooks (idempotent)
+      await NotificationService().initCore();
+      // Bind user-specific token & topics
+      await _cartController.subscribeToNotifications();
+      print('Cart notifications initialized');
+    } catch (e) {
+      print('Error initializing cart notifications: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +99,14 @@ class CartView extends StatelessWidget {
               title: Text('My Cart'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications, color: Colors.orange),
+              title: Text('Test Notification'),
+              onTap: () {
+                Navigator.pop(context);
+                _sendTestNotification();
               },
             ),
             Divider(),
@@ -369,33 +409,60 @@ class CartView extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel'),
           ),
-          ElevatedButton(
+                      ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
-              final loggedOut = await _authController.logout();
-              if (context.mounted) {
-                if (loggedOut) {
+              if (mounted) Navigator.pop(context);
+              
+              // Show loading indicator using global navigator (safe across route changes)
+              final rootContext = Navigator.of(context, rootNavigator: true).context;
+              showDialog(
+                context: rootContext,
+                barrierDismissible: false,
+                useRootNavigator: true,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
+              );
+              
+              try {
+                // Perform logout first to avoid permission issues on Firestore listeners
+                final loggedOut = await _authController.logout();
+                
+                // Close loading dialog (ensure root navigator)
+                try {
+                  final nav = Navigator.of(rootContext, rootNavigator: true);
+                  if (nav.canPop()) nav.pop();
+                } catch (_) {}
+                
+                if (!loggedOut && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Logged out successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Failed to log out'),
                       backgroundColor: Colors.red,
                     ),
                   );
+                } else {
+                  // After auth state changed and UI navigates away, clean up messaging topics/token safely
+                  // Do this in microtask to avoid race with route change
+                  Future.microtask(() async {
+                    try {
+                      await _cartController.unsubscribeFromNotifications();
+                    } catch (_) {}
+                  });
                 }
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginView(),
-                  ),
-                  (route) => false,
-                );
+                // AuthWrapper will redirect automatically
+              } catch (e) {
+                // Close loading dialog and show error
+                try {
+                  final nav = Navigator.of(rootContext, rootNavigator: true);
+                  if (nav.canPop()) nav.pop();
+                } catch (_) {}
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error during logout: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -407,5 +474,25 @@ class CartView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Send test notification
+  Future<void> _sendTestNotification() async {
+    try {
+      await _notificationService.sendTestNotification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Test notification sent!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send test notification: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
