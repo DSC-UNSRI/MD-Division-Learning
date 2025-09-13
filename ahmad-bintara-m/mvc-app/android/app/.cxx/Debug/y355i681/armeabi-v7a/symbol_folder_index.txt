@@ -1,0 +1,1 @@
+C:\MVC-App\Secure-MVC-Flutter-Firebase-Example\build\app\intermediates\cxx\Debug\y355i681\obj\armeabi-v7a
