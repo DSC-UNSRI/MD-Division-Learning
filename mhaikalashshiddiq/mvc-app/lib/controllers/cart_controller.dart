@@ -1,10 +1,15 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/cart_item.dart';
+import '../services/notification_service.dart';
 
 class CartController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final NotificationService _notificationService = NotificationService();
+  StreamSubscription<QuerySnapshot>? _cartListenerSub;
 
   // Get reference to cart collection
   CollectionReference get _cartCollection => _firestore.collection('cart');
@@ -110,5 +115,105 @@ class CartController {
       // Return empty stream if not authenticated
       return Stream.value([]);
     }
+  }
+
+  // Initialize cart listener for real-time updates
+  void initializeCartListener() {
+    try {
+      final userId = _currentUserId;
+      
+      // Listen to all cart changes for notifications
+      _cartListenerSub?.cancel();
+      _cartListenerSub = _cartCollection.snapshots().listen(
+        (snapshot) {
+          for (var change in snapshot.docChanges) {
+            _handleCartChange(change);
+          }
+        },
+        onError: (Object error) {
+          // Suppress permission errors that can occur during logout/navigation
+          debugPrint('Cart listener error (ignored): $error');
+        },
+      );
+      
+      print('Cart listener initialized for user: $userId');
+    } catch (e) {
+      print('Error initializing cart listener: $e');
+    }
+  }
+
+  void stopCartListener() {
+    _cartListenerSub?.cancel();
+    _cartListenerSub = null;
+  }
+
+  // Handle cart changes for notifications
+  void _handleCartChange(DocumentChange change) {
+    try {
+      final data = change.doc.data() as Map<String, dynamic>?;
+      if (data == null) return;
+      
+      final item = CartItem.fromMap(data);
+      final currentUserId = _auth.currentUser?.uid;
+      
+      // Don't notify for own changes
+      if (item.userId == currentUserId) return;
+      
+      String title = '';
+      String body = '';
+      
+      switch (change.type) {
+        case DocumentChangeType.added:
+          title = 'New Cart Item Added';
+          body = '${item.name} (${item.quantity}) was added to the cart';
+          break;
+        case DocumentChangeType.modified:
+          title = 'Cart Item Updated';
+          body = '${item.name} was updated in the cart';
+          break;
+        case DocumentChangeType.removed:
+          title = 'Cart Item Removed';
+          body = '${item.name} was removed from the cart';
+          break;
+      }
+      
+      // Show local notification for real-time updates
+      _showCartUpdateNotification(title, body, item);
+      
+    } catch (e) {
+      print('Error handling cart change: $e');
+    }
+  }
+
+  // Show cart update notification
+  void _showCartUpdateNotification(String title, String body, CartItem item) {
+    _notificationService.showLocal(
+      title,
+      body,
+      data: {
+        'type': 'cart_update',
+        'itemId': item.id,
+        'name': item.name,
+        'quantity': item.quantity,
+      },
+    );
+  }
+
+  // Get FCM token for current user
+  Future<String?> getFCMToken() async {
+    return await _notificationService.getToken();
+  }
+
+  // Subscribe to cart update notifications
+  Future<void> subscribeToNotifications() async {
+    await _notificationService.initializeForUser();
+    // Also ensure token is saved and topics are subscribed after login
+    initializeCartListener();
+  }
+
+  // Unsubscribe from notifications (call on logout)
+  Future<void> unsubscribeFromNotifications() async {
+    await _notificationService.unsubscribeFromTopics();
+    await _notificationService.removeTokenFromFirestore();
   }
 }

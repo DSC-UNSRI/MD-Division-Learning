@@ -64,12 +64,21 @@ class AuthController {
       );
       final user = userCredential.user;
 
-      if (user != null && !user.emailVerified) {
-        if (kDebugMode) debugPrint('Email not verified for user: $email');
-        return AuthResult(
-          user: null,
-          error: 'Email not verified. Please verify your email.',
-        );
+      // Optional: if you enforce email verification, keep this; otherwise disable to not block FCM setup
+      // if (user != null && !user.emailVerified) {
+      //   if (kDebugMode) debugPrint('Email not verified for user: $email');
+      //   return AuthResult(
+      //     user: null,
+      //     error: 'Email not verified. Please verify your email.',
+      //   );
+      // }
+
+      // Ensure users/{uid} document exists (needed by backend listener to locate tokens)
+      if (user != null) {
+        final doc = await _firestore.collection('users').doc(user.uid).get();
+        if (!doc.exists) {
+          await saveUserToFirestore(user);
+        }
       }
 
       return AuthResult(user: user, error: null);
@@ -129,6 +138,8 @@ class AuthController {
 
   Future<bool> logout() async {
     try {
+      // Delay stopping Firestore listeners until after auth state changes
+      // The UI layer handles unsubscribing topics & removing tokens safely
       await _auth.signOut();
       return true;
     } catch (e) {

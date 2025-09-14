@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../models/cart_item.dart';
 
 class CartController {
@@ -23,6 +24,12 @@ class CartController {
     );
 
     await _cartCollection.doc(newItem.id).set(newItem.toMap());
+
+    // Log for backend to listen
+    if (kDebugMode) {
+      debugPrint(
+          'Cart item added: ${newItem.name} by user ${_currentUser!.uid}');
+    }
   }
 
   Future<void> updateItem(String itemId, String name, int newQuantity) async {
@@ -36,6 +43,11 @@ class CartController {
       'quantity': newQuantity,
       'updatedAt': DateTime.now().toIso8601String(),
     });
+
+    // Log for backend to listen
+    if (kDebugMode) {
+      debugPrint('Cart item updated: $name by user ${_currentUser!.uid}');
+    }
   }
 
   Future<void> deleteItem(String itemId) async {
@@ -45,6 +57,11 @@ class CartController {
     if (!doc.exists || doc['userId'] != _currentUser!.uid) return;
 
     await _cartCollection.doc(itemId).delete();
+
+    // Log for backend to listen
+    if (kDebugMode) {
+      debugPrint('Cart item deleted: $itemId by user ${_currentUser!.uid}');
+    }
   }
 
   Stream<List<CartItem>> getItems() {
