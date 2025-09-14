@@ -25,19 +25,18 @@
 
   * **SDG 4: Quality Education**
   * (Opsional tambahan: **SDG 8: Decent Work and Economic Growth**)
-* **Justification:** Aplikasi ini mendukung akses informasi pendidikan yang inklusif dan membantu mahasiswa mempersiapkan karir dengan berbagi pengetahuan, pengalaman, dan peluang.
+* **Justification:** Aplikasi ini mendukung akses informasi pendidikan yang inklusif dan membantu mahasiswa mempersiapkan karir dan pembelajaran dengan berbagi pengetahuan, pengalaman, dan peluang.
 
 ---
 
 ### 4. Target Users & Use Cases
 
-* **Target Users:** Mahasiswa (S1, D3, Pascasarjana), fresh graduates, alumni muda.
+* **Target Users:** Mahasiswa (S1, D3, Pascasarjana) fresh graduates.
 * **Use Cases:**
 
   * Mahasiswa bertanya soal beasiswa, magang, atau tips kuliah.
-  * Senior/alumni menjawab berdasarkan pengalaman pribadi.
+  * Senior/alumni atau semua yang punya pengalaman terkait menjawab berdasarkan pengalaman pribadi.
   * Diskusi kelompok berdasarkan topik tertentu (misalnya: “Tips Skripsi”, “Karir IT”, “Pertukaran Mahasiswa”).
-  * Cari mentor atau teman diskusi sesuai minat akademik/karir.
 
 ---
 
@@ -45,8 +44,7 @@
 
 * **Auth & Profile:** Sign up/login, buat profil mahasiswa (jurusan, kampus, minat).
 * **Forum Diskusi:** Post pertanyaan, balas thread, beri upvote/like.
-* **Kategori & Tag:** Pertanyaan bisa diberi kategori (beasiswa, skripsi, magang, karir).
-* **Search & Filter:** Cari topik atau pertanyaan dengan cepat.
+* **Search:** Cari topik atau pertanyaan dengan cepat.
 * **Notifikasi:** Update ketika ada jawaban baru atau mention.
 * **Bookmark:** Simpan thread yang relevan.
 * **Moderasi:** Report spam atau konten tidak pantas.
@@ -55,16 +53,12 @@
 
 ### 6. Technical Details
 
-* **Architecture Pattern:** MVVM (agar mudah maintain dan scalable).
+* **Architecture Pattern:** MVVC.
 * **Key Packages/Dependencies:**
 
   * Firebase Auth (login)
   * Firebase Firestore (database forum & user)
-  * Provider / Riverpod (state management)
   * Flutter Notifications (push notif)
-  * CachedNetworkImage (profile & image post)
-* **Database/Storage:** Firebase Firestore + Firebase Storage (untuk upload gambar).
-* **Other Integrations:** (opsional) AI summarizer untuk merangkum jawaban panjang.
 
 ---
 
@@ -82,15 +76,12 @@
 
 * Real-time forum diskusi dengan Firebase Firestore.
 * Implementasi notifikasi push berbasis topic subscription.
-* Sistem tagging & searching (indexing Firestore).
-* Opsi tambahan: Integrasi AI (contoh: rekomendasi pertanyaan relevan).
+* Sistem searching.
 
 ---
 
 ### 9. Testing Strategy (Optional)
-
-* **Unit Tests:** Auth service, Firestore service (CRUD).
-* **Integration Tests:** Alur utama (login → buat pertanyaan → balas pertanyaan).
+-
 
 ---
 
@@ -98,6 +89,6 @@
 
 * **Week 1:** Setup project, struktur folder, auth page.
 * **Week 2:** Implementasi forum (CRUD post & reply).
-* **Week 3:** Fitur tambahan (kategori, search, bookmark).
+* **Week 3:** Fitur tambahan (search & bookmark).
 * **Week 4:** Integrasi notifikasi, moderasi.
 * **Week 5:** Testing, dokumentasi, finalisasi repo.
