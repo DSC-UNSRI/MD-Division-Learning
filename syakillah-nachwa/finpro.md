@@ -53,7 +53,7 @@
 
 ### 6. Technical Details
 
-* **Architecture Pattern:** MVVC.
+* **Architecture Pattern:** MVC.
 * **Key Packages/Dependencies:**
 
   * Firebase Auth (login)
