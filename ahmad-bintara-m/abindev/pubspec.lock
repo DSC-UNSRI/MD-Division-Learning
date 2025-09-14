@@ -309,5 +309,9 @@ sdks:
     version: "1.1.1"
 sdks:
   dart: ">=3.6.1 <4.0.0"
+<<<<<<< HEAD
   flutter: ">=3.27.0"
 >>>>>>> upstream/main:ahmad-bintara-m/abindev/pubspec.lock
+=======
+  flutter: ">=3.27.0"
+>>>>>>> upstream/main

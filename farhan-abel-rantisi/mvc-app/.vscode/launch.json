@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "testing (debug mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--dart-define", "V+h5EzW8uWDsM1ckFUHsSg1DMp4tMLfOUZeGSMlwEK4=",
+                "--dart-define", "oDmG/NTkbu7Sh8AcHMHQRg==",
+            ],
+            "console": "debugConsole",
+        },
+        {
+            "name": "testing (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define", "V+h5EzW8uWDsM1ckFUHsSg1DMp4tMLfOUZeGSMlwEK4=",
+                "--dart-define", "oDmG/NTkbu7Sh8AcHMHQRg==",
+            ],
+        },
+        {
+            "name": "testing (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--dart-define", "V+h5EzW8uWDsM1ckFUHsSg1DMp4tMLfOUZeGSMlwEK4=",
+                "--dart-define", "IoDmG/NTkbu7Sh8AcHMHQRg==",
+            ],
+        }
+    ]
+}

@@ -8,15 +8,11 @@ part 'env.g.dart';
 )
 abstract class Env {
   static Env create() {
-    String encryptionKey = const String.fromEnvironment(
-        "ENCRYPTION_KEY"); // On build, change with your generated encryption key in launch.json.example into launch.json (VS Code)
-    String iv = const String.fromEnvironment(
-        "IV_KEY"); // On build, change with your generated iv in launch.json.example into launch.json (VS Code)
-    return Env(encryptionKey, iv);
-  }
+  return const Env();
+}
 
-  const factory Env(String encryptionKey, String iv) =
-      _$Env; // You can call const env = Env('encryption-key', 'iv') from another Dart file using this
+
+  const factory Env() = _$Env; // You can call const env = Env('encryption-key', 'iv') from another Dart file using this
 
   const Env._();
 
