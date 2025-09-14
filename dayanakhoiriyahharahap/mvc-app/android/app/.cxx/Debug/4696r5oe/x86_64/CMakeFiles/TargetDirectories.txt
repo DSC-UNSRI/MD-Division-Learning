@@ -1,0 +1,2 @@
+G:/dayanakhoiriyahharahap/mvc-app/android/app/.cxx/Debug/4696r5oe/x86_64/CMakeFiles/edit_cache.dir
+G:/dayanakhoiriyahharahap/mvc-app/android/app/.cxx/Debug/4696r5oe/x86_64/CMakeFiles/rebuild_cache.dir
