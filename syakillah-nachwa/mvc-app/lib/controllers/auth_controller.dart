@@ -1,11 +1,14 @@
+// lib/controllers/auth_controller.dart - UPDATED VERSION
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/auth_result.dart';
+import '../services/notification_service.dart';
 
 class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationService _notificationService = NotificationService();
 
   Future<AuthResult> loginWithEmail(String email, String password) async {
     try {
@@ -21,6 +24,11 @@ class AuthController {
           user: null,
           error: 'Email not verified. Please verify your email.',
         );
+      }
+
+      // Initialize notifications setelah login berhasil
+      if (user != null) {
+        await _initializeUserNotifications();
       }
 
       return AuthResult(user: user, error: null);
@@ -48,6 +56,8 @@ class AuthController {
           'name': name,
           'bio': '',
           'email': email,
+          'createdAt': DateTime.now().millisecondsSinceEpoch,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
         });
         
         await user.sendEmailVerification();
@@ -81,8 +91,13 @@ class AuthController {
             'name': user.displayName ?? 'User',
             'bio': '',
             'email': user.email ?? '',
+            'createdAt': DateTime.now().millisecondsSinceEpoch,
+            'updatedAt': DateTime.now().millisecondsSinceEpoch,
           });
         }
+
+        // Initialize notifications setelah login berhasil
+        await _initializeUserNotifications();
       }
 
       return AuthResult(user: user, error: null);
@@ -95,6 +110,9 @@ class AuthController {
 
   Future<bool> logout() async {
     try {
+      // Cleanup notifications sebelum logout
+      await _notificationService.cleanup();
+      
       await _auth.signOut();
       return true;
     } catch (e) {
@@ -102,9 +120,20 @@ class AuthController {
       return false;
     }
   }
+
+  // Initialize notifications untuk user yang baru login
+  Future<void> _initializeUserNotifications() async {
+    try {
+      await _notificationService.initialize();
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error initializing notifications: $e');
+    }
+  }
+
   String? getCurrentUserId() {
     return _auth.currentUser?.uid;
   }
+
   Future<Map<String, dynamic>?> getCurrentUserData() async {
     final user = _auth.currentUser;
     if (user == null) return null;
@@ -120,6 +149,7 @@ class AuthController {
       return null;
     }
   }
+
   Future<bool> updateUserProfile(String name, String bio) async {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -128,6 +158,7 @@ class AuthController {
       await _firestore.collection('users').doc(user.uid).update({
         'name': name,
         'bio': bio,
+        'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
       return true;
     } catch (e) {
